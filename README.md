@@ -32,7 +32,9 @@ hardware.
 Execute `aircontrol -h` to see a quick overview over all available command line parameters. The following parameters are available:
 
 `-c <file>` &nbsp; Configuration file, defaulting to */etc/aircontrol.conf*. This file is mandatory.
-        
+
+`-g <pin>` &nbsp; Override the GPIO pin to be used for scanning and targeting. The parameter must be a Broadcom GPIO number, not re-mapped. Might be used for quickly testing multiple transmitters or receivers.
+
 `-l` &nbsp; Limit the number of aircontrol instances to 1, i.e. prevent multiple program instances.
         
 `-s <ms>` &nbsp; Perform an air scan for the given number of milliseconds. An ASCII graph will be written to stdout which can be redirected to a file with `tee` or something similar.

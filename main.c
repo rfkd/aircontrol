@@ -1,7 +1,7 @@
 /*
  * This file is part of aircontrol.
  *
- * Copyright (C) 2014 Ralf Dauberschmidt <ralf@dauberschmidt.de>
+ * Copyright (C) 2014-2015 Ralf Dauberschmidt <ralf@dauberschmidt.de>
  *
  * aircontrol is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@
 #include <main.h>
 
 // Version token: A
-#define VERSION "$Revision: 74 $"
+#define VERSION "$Revision: 79 $"
 
 
 // MISCELLANEOUS ///////////////////////////////////////////////////////////////
@@ -45,10 +45,12 @@ static void printUsage(const char *program) {
 		"Usage: %s [options]\n"
 		"Available options:\n"
 		"  -c <file>\tConfiguration file [%s]\n"
+		"  -g <pin>\tOverride GPIO pin from configuration\n"
 		"  -l\t\tPrevent multiple program instances\n"
 		"  -s <ms>\tAir scan for given period\n"
 		"  -t <target>\tExecute target configuration\n"
-		"\nCopyright (C) 2014 Ralf Dauberschmidt <ralf@dauberschmidt.de>\n\n",
+		"\nCopyright (C) 2014-2015 Ralf Dauberschmidt "
+			"<ralf@dauberschmidt.de>\n\n",
 		VERSION, program, AC_CONFIG_FILE);
 }
 
@@ -87,7 +89,7 @@ static void instanceLock(void) {
 // MAIN PROGRAM ////////////////////////////////////////////////////////////////
 
 int main(int argc, char **argv) {
-	int ch;
+	int ch, gpioPin = -1;
 	char *fileName = NULL, *targetName = NULL;
 	unsigned int scanLength = 0;
 	bool singleInstance = false;
@@ -97,7 +99,7 @@ int main(int argc, char **argv) {
 	Target target;
 
 	opterr = 0;
-	while ((ch = getopt(argc, argv, "c:ls:t:")) != -1) {
+	while ((ch = getopt(argc, argv, "c:g:ls:t:")) != -1) {
 		switch (ch) {
 			case 'c':
 				fileName = strdup(optarg);
@@ -105,6 +107,10 @@ int main(int argc, char **argv) {
 					fprintf(stderr, "Memory allocation failed.\n");
 					return RET_ERR_INTERNAL;
 				}
+				break;
+
+			case 'g':
+				gpioPin = atoi(optarg);
 				break;
 
 			case 'l':
@@ -165,13 +171,14 @@ int main(int argc, char **argv) {
 	if (scanLength > 0) {
 		char *scanData;
 
-		scan.gpioPin = -1;
+		scan.gpioPin = gpioPin;
 		scan.samplingRate = -1;
 		scan.scanLength = scanLength;
 
 		setting = config_lookup(&cfg, "scan");
 		if (setting != NULL) {
-			config_setting_lookup_int(setting, "gpioPin", &scan.gpioPin);
+			if (gpioPin == -1)
+				config_setting_lookup_int(setting, "gpioPin", &scan.gpioPin);
 			config_setting_lookup_int(setting, "samplingRate",
 				&scan.samplingRate);
 		}
@@ -204,7 +211,7 @@ int main(int argc, char **argv) {
 	// Target control
 	} else {
 		target._name = targetName;
-		target.gpioPin = -1;
+		target.gpioPin = gpioPin;
 		target.dataLength = -1;
 		target.syncLength = -1;
 		target.airCode = -1;
@@ -214,7 +221,8 @@ int main(int argc, char **argv) {
 
 		setting = config_lookup(&cfg, "target");
 		if (setting != NULL) {
-			config_setting_lookup_int(setting, "gpioPin", &target.gpioPin);
+			if (gpioPin == -1)
+				config_setting_lookup_int(setting, "gpioPin", &target.gpioPin);
 			config_setting_lookup_int(setting, "dataLength",&target.dataLength);
 			config_setting_lookup_int(setting, "syncLength",&target.syncLength);
 			config_setting_lookup_int(setting, "airCode", &target.airCode);
@@ -225,7 +233,8 @@ int main(int argc, char **argv) {
 
 		setting = config_lookup(&cfg, targetName);
 		if (setting != NULL) {
-			config_setting_lookup_int(setting, "gpioPin", &target.gpioPin);
+			if (gpioPin == -1)
+				config_setting_lookup_int(setting, "gpioPin", &target.gpioPin);
 			config_setting_lookup_int(setting, "dataLength",&target.dataLength);
 			config_setting_lookup_int(setting, "syncLength",&target.syncLength);
 			config_setting_lookup_int(setting, "airCode", &target.airCode);
