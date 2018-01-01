@@ -1,13 +1,13 @@
-#**aircontrol**
+# **aircontrol**
 
-###**FEATURES**
+### **FEATURES**
 
 *  Send configurable patterns with manchester or RCO-compatible encoding through a 433,92 MHz transmitter.
 * Air scan support in combination with a 433,92 MHz receiver for analyzing data streams. This can replace an oscilloscope if timing and code scheme are already known.
 * Configuration file support for easily addressing air targets.
 
 
-###**INSTALLATION**
+### **INSTALLATION**
 
 aircontrol needs to be compiled on a Raspberry Pi (or on a host with a compatible cross tool chain). The following libraries are needed:
 
@@ -27,7 +27,7 @@ Please note that aircontrol needs to be executed as root for accessing the GPIO
 hardware.
 
 
-###**COMMAND LINE PARAMETERS**
+### **COMMAND LINE PARAMETERS**
 
 Execute `aircontrol -h` to see a quick overview over all available command line parameters. The following parameters are available:
 
@@ -44,13 +44,13 @@ Execute `aircontrol -h` to see a quick overview over all available command line 
 Either parameter `-s` or `-t` is mandatory.
 
 
-###**CONFIGURATION FILE**
+### **CONFIGURATION FILE**
 
 The default configuration file is located in */etc/aircontrol.conf*. For details about the configuration file syntax check the manual of libconfig on its project site: <http://www.hyperrealm.com/libconfig/libconfig_manual.html>
 
 The configuration consists of different sections explained below.
 
-####'scan' section
+#### 'scan' section
 
 This section defines all air scan relevant parameters.
 
@@ -58,7 +58,7 @@ This section defines all air scan relevant parameters.
 
 `samplingRate` &nbsp; Delay between two samples when air scanning in microseconds. This parameter in combination with the `-s` value defines the number of segments being output. For example when scanning for 1ms (=1000us) with a `samplingRate` of 100us there will be 10 segments printed to stdout. Example: `samplingRate = 100;`
 
-####'target' section
+#### 'target' section
 
 This section stores configuration defaults for all target sections.
 
@@ -87,6 +87,6 @@ This section stores configuration defaults for all target sections.
     ___| |__|  |_| |__| |_| 
     sss  0  1  0   0  1   1 SSS
 
-####Actual target sections
+#### Actual target sections
 
 The actual target sections can be named freely, they incorporate all defaults from the 'target' section. All parameters from the 'target' section apply. For example all timing relevant parameters can be defined in the 'target' section while the real target sections only contain the appropriate `airCommand`.
