@@ -75,7 +75,7 @@ bool targetValidate(Target *target) {
 		fprintf(stderr, "Configuration error (target %s): airCode "
 			"undefined.\n", target->_name);
 		return false;
-	} else if (target->airCode > CODE_RCO) {
+	} else if (target->airCode > CODE_WOFI) {
 		fprintf(stderr, "Configuration error (target %s): airCode "
 			"invalid.\n", target->_name);
 		return false;
@@ -93,6 +93,18 @@ bool targetValidate(Target *target) {
 			return RET_ERR_INTERNAL;
 		}
 	} else if (target->airCode == CODE_RCO) {
+		airCommandChars = strdup("01");
+		if (airCommandChars == NULL) {
+			fprintf(stderr, "Memory allocation failed.\n");
+			return RET_ERR_INTERNAL;
+		}
+	} else if (target->airCode == CODE_TORMATIC) {
+		airCommandChars = strdup("01");
+		if (airCommandChars == NULL) {
+			fprintf(stderr, "Memory allocation failed.\n");
+			return RET_ERR_INTERNAL;
+		}
+	} else if (target->airCode == CODE_WOFI) {
 		airCommandChars = strdup("01");
 		if (airCommandChars == NULL) {
 			fprintf(stderr, "Memory allocation failed.\n");
@@ -183,8 +195,56 @@ void targetControl(Target *target) {
 						break;
 				}
 			}
-		}
+		} else if (target->airCode == CODE_TORMATIC) {
+			for (int i = 0; i < strlen(target->airCommand); i++) {
+				
+				switch (target->airCommand[i]) {
+					case '0':
+					    digitalWrite(target->gpioPin, HIGH);
+						usleep(target->dataLength/3);
+						digitalWrite(target->gpioPin, LOW);
+						usleep(target->dataLength/3*2);
+						printf("0");
+						
+						break;
 
+					case '1':
+					   digitalWrite(target->gpioPin, HIGH);
+						usleep(target->dataLength/3);
+						digitalWrite(target->gpioPin, LOW);
+						usleep(target->dataLength/3);
+						digitalWrite(target->gpioPin, HIGH);
+						usleep(target->dataLength/3);
+						printf("1");
+						break;
+				}
+			}
+			
+		}
+		
+		else if (target->airCode == CODE_WOFI) {
+			
+			usleep(target->sendDelay);
+			
+			for (int i = 0; i < strlen(target->airCommand); i++) {
+				digitalWrite(target->gpioPin, HIGH);
+				switch (target->airCommand[i]) {
+					case '0':
+						
+						usleep(target->dataLength/3.8);
+						digitalWrite(target->gpioPin, LOW);
+						usleep(target->dataLength/1.35);
+						break;
+
+					case '1':
+						usleep(target->dataLength/1.35);
+						digitalWrite(target->gpioPin, LOW);
+						usleep(target->dataLength/3.8);
+						break;
+				}
+			}
+		} 
+		  
 		if (n != target->sendCommand-1)
 			usleep(target->sendDelay);
 	}
