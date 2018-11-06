@@ -1,7 +1,7 @@
 #
 # This file is part of aircontrol.
 # 
-# Copyright (C) 2014 Ralf Dauberschmidt <ralf@dauberschmidt.de>
+# Copyright (C) 2014-2018 Ralf Dauberschmidt <ralf@dauberschmidt.de>
 # 
 # aircontrol is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,24 +19,33 @@
 
 APP=aircontrol
 
-CC=gcc
-CFLAGS=-O3 -Wall -Wno-unused-result -std=gnu99 -fno-strict-aliasing -I.
+CC=g++
+CFLAGS=-std=c++14 -Wall -Wno-unused-result -Iinclude
 LDFLAGS=-lconfig -lwiringPi
 
-SRC=main.c scan.c target.c
-OBJ=$(SRC:.c=.o)
+BIN_DIR=bin
+BUILD_DIR=build
+ETC_DIR=etc
+SRC_DIR=source
 
-all: $(SRC) $(APP)
-	
-$(APP): $(OBJ) 
+SRC := $(wildcard $(SRC_DIR)/*.cpp)
+OBJ=$(patsubst $(SRC_DIR)/%,$(BUILD_DIR)/%,$(SRC:.cpp=.o))
+
+$(BIN_DIR)/$(APP): pre-build scripts/version.sh $(OBJ)
 	$(CC) $(LDFLAGS) $(OBJ) -o $@
 
-.c.o:
-	$(CC) -c $(CFLAGS) $< -o $@
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@mkdir -p $(BUILD_DIR)
+	$(CC) -c $(CFLAGS) -o $@ $<
+
+.PHONY: pre-build
+pre-build:
+	@rm -f $(BUILD_DIR)/$(APP).o
+	@sh scripts/version.sh
 
 install: all
-	cp $(APP) /usr/local/bin/
-	cp $(APP).conf /etc/
+	cp $(BIN_DIR)/$(APP) /usr/local/bin/
+	cp $(ETC_DIR)/$(APP).conf /etc/
 
 uninstall:
 	rm -f /usr/local/bin/$(APP)
@@ -44,5 +53,4 @@ uninstall:
 
 .PHONY: clean
 clean:
-	rm -f $(APP) $(OBJ)
-	
+	rm -rf $(BUILD_DIR) $(BIN_DIR)/$(APP)

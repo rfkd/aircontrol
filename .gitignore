@@ -1,4 +1,11 @@
+# Eclipse configuration
 .cproject
 .project
-aircontrol
-*.o
+.settings
+
+# Binary and build directories
+bin
+build
+
+# Automatically generated files
+include/Version.h
