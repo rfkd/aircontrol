@@ -42,9 +42,15 @@ private:
     /// Target parameters.
     std::unique_ptr<TargetParameters> parameters_;
 
-    /// Control a target with Manchester encoding.
-    void controlManchester(void) const;
+    /// Control the target.
+    void control(void) const;
 
-    /// Control a target with RCO encoding.
-    void controlRemoteControlledOutled(void) const;
+    /// Send the air command with Manchester encoding.
+    void sendAirCommandManchester(void) const;
+
+    /// Send the air command with RCO encoding.
+    void sendAirCommandRemoteControlledOutled(void) const;
+
+    /// Send the air command with Tormatic encoding.
+    void sendAirCommandTormatic(void) const;
 };

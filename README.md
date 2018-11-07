@@ -11,7 +11,9 @@
 
 The following devices have been confirmed to work with aircontrol: 
 * ELRO AB440S and many similar wireless outlets (encoding type: Remote Controlled Outlet)
+* Tormatic garage doors (encoding type: Tormatic)
 * Warema EWFS based devices, e.g. shutters (encoding type: Manchester)
+* WOFI FC-66 controlled lamps (encoding type: Remote Controlled Outlet) 
 
 If you are controlling other devices with aircontrol please let me know.
 
@@ -44,9 +46,9 @@ Execute `aircontrol -h` to see a quick overview over all available command line 
 `-g <pin>` &nbsp; Override the GPIO pin to be used for scanning and targeting. The parameter must be a Broadcom GPIO number, not re-mapped. Might be used for quickly testing multiple transmitters or receivers.
 
 `-l` &nbsp; Limit the number of aircontrol instances to 1, i.e. prevent multiple program instances.
-        
+
 `-s <ms>` &nbsp; Perform an air scan for the given number of milliseconds. An ASCII graph will be written to stdout which can be redirected to a file with `tee` or something similar.
-        
+
 `-t <target>` &nbsp; Execute the given air target, i.e. transmit the target code as configured.
 
 Either parameter `-s` or `-t` is mandatory.
@@ -82,12 +84,14 @@ This section stores configuration defaults for all target sections.
 
 `airCode` &nbsp; Encoding type of the air command. This parameter defines the validity and meaning of all `airCommand` values. The following radio frame encodings are currently supported. Example: `airCode = 0;`
 
-                               _           _               _ 
+                               _           _               _
     0  Manchester; values:  0)  |_    1) _|     s) _    S)
-                                             _            ___
-    1  Remote Controlled Outlet; values:  0) | |___    1) |   |_
+                                             _           ___
+    1  Remote Controlled Outlet; values:  0)  |___    1)    |_
         (for reference: 00 -> 0, 11 -> 1, 01 -> F)
-    
+                     _          _   _
+    2  Tormatic:  0)  |__    1)  |_| 
+
 
 `airCommand` &nbsp; Sequence of values to be transmitted. The accepted values of this parameter are defined by airCode. Example: `airCode = 0; airCommand = "sss010011SSS";`
 

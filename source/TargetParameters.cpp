@@ -188,6 +188,8 @@ bool TargetParameters::loadAirCommand(void) {
                 break;
 
             case Types::AirCode::REMOTE_CONTROLLED_OUTLET:
+                // Intentional fall-through
+            case Types::AirCode::TORMATIC:
                 elements = "01";
                 break;
 
