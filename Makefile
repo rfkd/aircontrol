@@ -33,6 +33,7 @@ OBJ:=$(patsubst $(SRC_DIR)/%,$(BUILD_DIR)/%,$(SRC:.cpp=.o))
 DEPS:=$(OBJ:.o=.d)
 
 $(BIN_DIR)/$(APP): pre-build scripts/version.sh $(OBJ)
+	@mkdir -p $(BIN_DIR)
 	$(CC) $(LDFLAGS) $(OBJ) -o $@
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
@@ -41,7 +42,6 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 
 .PHONY: pre-build
 pre-build:
-	@rm -f $(BUILD_DIR)/$(APP).o
 	@sh scripts/version.sh
 
 install: all
@@ -59,7 +59,7 @@ doc:
 
 .PHONY: clean
 clean:
-	rm -rf $(BUILD_DIR) $(BIN_DIR)/$(APP)
+	rm -rf $(BUILD_DIR) $(BIN_DIR)
 	rm -rf Doxygen/html Doxygen/*.db
 
 -include $(DEPS)
