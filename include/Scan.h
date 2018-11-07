@@ -29,17 +29,17 @@
 class Scan : public Task {
 public:
     /// Class constructor.
-    Scan(Configuration & configuration);
+    Scan(Configuration & configuration, const int32_t durationMs);
 
     /// Start the air scan.
-    int start(const int32_t durationMs);
+    int start(void) final;
 
 private:
     /**
      * @brief Air scan duration.
      * @note Unit: milliseconds
      */
-    //int32_t durationMs_;
+    const int32_t durationMs_;
 
     /**
      * @brief Delay between two samples when air scanning.

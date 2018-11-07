@@ -19,6 +19,7 @@
 
 #include <cstdint>
 #include <iostream>
+#include <memory>
 #include <unistd.h>
 
 #include <wiringPi.h>
@@ -28,6 +29,7 @@
 #include "Scan.h"
 #include "Target.h"
 #include "Task.h"
+#include "Types.h"
 #include "Version.h"
 
 /// @brief Display the program usage.
@@ -37,8 +39,8 @@ static void printUsage(void) {
         << std::endl
         << "Usage: aircontrol <options>" << std::endl
         << "Available options:" << std::endl
-        << "  -c <file>\tConfiguration file [" << Configuration::DEFAULT_LOCATION
-        << "]" << std::endl
+        << "  -c <file>\tConfiguration file ["
+        << Configuration::DEFAULT_LOCATION << "]" << std::endl
         << "  -g <pin>\tOverride GPIO pin from configuration" << std::endl
         << "  -l\t\tPrevent multiple program instances" << std::endl
         << "  -s <ms>\tAir scan for given period" << std::endl
@@ -56,15 +58,8 @@ static void printUsage(void) {
  */
 int main(int argc, char **argv) {
     Configuration configuration;
-    Scan scan(configuration);
-    int32_t scanDurationMs;
-    Target target(configuration);
-    std::string targetName;
-    enum {
-        UNKNOWN,
-        SCAN,
-        TARGET
-    } selectedTask = UNKNOWN;
+    std::unique_ptr<Task> task;
+    uint8_t gpio = Types::INVALID_GPIO_PIN;
 
     // Parse command line arguments
     int option;
@@ -76,8 +71,7 @@ int main(int argc, char **argv) {
                 break;
 
             case 'g':
-                scan.setGpioPin(static_cast<uint8_t>(atoi(optarg)));
-                target.setGpioPin(static_cast<uint8_t>(atoi(optarg)));
+                gpio = static_cast<uint8_t>(atoi(optarg));
                 break;
 
             case 'l':
@@ -89,23 +83,23 @@ int main(int argc, char **argv) {
                     std::cerr << "Error: Air scan duration must be >0ms."
                         << std::endl;
                     return EXIT_FAILURE;
-                } else if (selectedTask != UNKNOWN) {
+                } else if (task != nullptr) {
                     std::cerr << "Error: Parallel tasks are not supported "
                         "(omit parameter '-s')." << std::endl;
                     return EXIT_FAILURE;
                 }
-                scanDurationMs = atoi(optarg);
-                selectedTask = SCAN;
+                task = std::make_unique<Scan>(Scan(configuration,
+                    atoi(optarg)));
                 break;
 
             case 't':
-                if (selectedTask != UNKNOWN) {
+                if (task != nullptr) {
                     std::cerr << "Error: Parallel tasks are not supported "
                         "(omit parameter '-t')." << std::endl;
                     return EXIT_FAILURE;
                 }
-                targetName = std::string(optarg);
-                selectedTask = TARGET;
+                task = std::make_unique<Target>(Target(configuration,
+                    std::string(optarg)));
                 break;
 
             default:
@@ -113,29 +107,21 @@ int main(int argc, char **argv) {
                 return EXIT_FAILURE;
         }
     }
+    if (task == nullptr) {
+        std::cerr << "Error: Either parameter '-s' or '-t' is mandatory."
+            << std::endl;
+        printUsage();
+        return EXIT_FAILURE;
+    }
 
     // Load the configuration
     if (!configuration.load()) {
         return EXIT_FAILURE;
     }
 
-    // Setup wiringPi: no port re-mapping, use Broadcom GPIO numbers
+    // Setup wiringPi (no port re-mapping, use Broadcom GPIO numbers)
+    task->setGpioPin(gpio);
     wiringPiSetupGpio();
 
-    // Execute the selected task
-    switch (selectedTask) {
-        case SCAN:
-            return scan.start(scanDurationMs);
-            break;
-
-        case TARGET:
-            return target.start(targetName);
-            break;
-
-        default:
-            std::cerr << "Error: Either parameter '-s' or '-t' is mandatory."
-                << std::endl;
-            printUsage();
-            return EXIT_FAILURE;
-    }
+    return task->start();
 }

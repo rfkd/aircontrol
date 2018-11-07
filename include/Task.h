@@ -36,6 +36,9 @@ public:
     /// Set the GPIO pin.
     void setGpioPin(const uint8_t gpioPin);
 
+    /// Start the task.
+    virtual int start(void) = 0;
+
 protected:
     /// GPIO pin.
     uint8_t gpioPin_ = Types::INVALID_GPIO_PIN;

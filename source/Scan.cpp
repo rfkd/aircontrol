@@ -22,18 +22,18 @@
 
 #include "Scan.h"
 
-/// @param configuration Reference of the configuration.
-Scan::Scan(Configuration & configuration) : Task(configuration) {
+/**
+ * @param configuration Reference of the configuration.
+ * @param durationMs Air scan duration (unit: milliseconds).
+ */
+Scan::Scan(Configuration & configuration, const int32_t durationMs) :
+        Task(configuration),
+        durationMs_(durationMs) {
     // Do nothing
 }
 
-/**
- * @param durationMs Air scan duration (unit: milliseconds).
- * @return Program exit code.
- */
-int Scan::start(const int32_t durationMs) {
-    //durationMs_ = durationMs;
-
+/// @return Program exit code.
+int Scan::start(void) {
     std::cout << "Not yet implemented." << std::endl;
     return EXIT_FAILURE;
 }

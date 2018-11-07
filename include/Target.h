@@ -30,12 +30,15 @@
 class Target : public Task {
 public:
     /// Class constructor.
-    Target(Configuration & configuration);
+    Target(Configuration & configuration, const std::string & name);
 
     /// Start the target control.
-    int start(const std::string name);
+    int start(void) final;
 
 private:
+    /// Target section name.
+    const std::string name_;
+
     /// Target parameters.
     std::unique_ptr<TargetParameters> parameters_;
 

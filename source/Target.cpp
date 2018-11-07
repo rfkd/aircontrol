@@ -25,28 +25,29 @@
 
 #include "Target.h"
 
-/// @param configuration Reference of the configuration.
-Target::Target(Configuration & configuration) : Task(configuration),
+/**
+ * @param configuration Reference of the configuration.
+ * @param name Target name string, must match a target configuration entry.
+ */
+Target::Target(Configuration & configuration, const std::string & name) :
+        Task(configuration),
+        name_(name),
         parameters_(nullptr) {
     // Do nothing
 }
 
-/**
- *
- * @param name Target name string, must match a target configuration entry.
- * @return Program exit code.
- */
-int Target::start(const std::string name) {
+/// @return Program exit code.
+int Target::start(void) {
     // Check whether the target exists
-    if (!configuration_.isValidSection(name)) {
-        std::cerr << "Error: Given target " << name << " cannot be found"
+    if (!configuration_.isValidSection(name_)) {
+        std::cerr << "Error: Given target " << name_ << " cannot be found"
             << std::endl;
         return EXIT_FAILURE;
     }
 
     assert(parameters_ == nullptr);
     parameters_ = std::make_unique<TargetParameters>(
-        TargetParameters(configuration_, name));
+        TargetParameters(configuration_, name_));
 
     // Load all parameters from the configuration
     if (!parameters_->load()) {
