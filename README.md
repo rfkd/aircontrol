@@ -2,9 +2,18 @@
 
 ### **FEATURES**
 
-* Send configurable patterns with manchester or RCO-compatible encoding through a 433,92 MHz transmitter.
-* Air scan support in combination with a 433,92 MHz receiver for analyzing data streams. This can replace an oscilloscope if timing and code scheme are already known.
+* Send configurable radio frames with different encodings through a radio transmitter supported by [WiringPi](http://wiringpi.com/).
+* Wireless scanning support in combination with a radio receiver for analyzing and reproducing radio frames.
 * Configuration file support for easily addressing air targets.
+
+
+### **SUPPORTED DEVICES**
+
+The following devices have been confirmed to work with aircontrol: 
+* ELRO AB440S and many similar wireless outlets (encoding type: Remote Controlled Outlet)
+* Warema EWFS based devices, e.g. shutters (encoding type: Manchester)
+
+If you are controlling other devices with aircontrol please let me know.
 
 
 ### **INSTALLATION**
