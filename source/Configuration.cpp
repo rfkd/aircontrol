@@ -24,12 +24,6 @@
 
 const std::string Configuration::DEFAULT_LOCATION = "/etc/aircontrol.conf";
 
-Configuration::~Configuration(void) {
-    if (isLoaded_) {
-        config_destroy(&configuration_);
-    }
-}
-
 /// @param location Absolute configuration file location.
 void Configuration::setLocation(const std::string & location) {
     location_ = location;
@@ -38,20 +32,17 @@ void Configuration::setLocation(const std::string & location) {
 /// @return True if the configuration has been loaded, false otherwise.
 bool Configuration::load(void) {
     assert(!isLoaded_);
-    config_init(&configuration_);
 
-    if (config_read_file(&configuration_, location_.c_str()) == CONFIG_FALSE) {
-        if (config_error_file(&configuration_) == nullptr) {
-            std::cerr << "Configuration error (" << location_
-                << "): file not found" << std::endl;
-        } else {
-            std::cerr << "Configuration error ("
-                << config_error_file(&configuration_)
-                << ":" << config_error_line(&configuration_)
-                << "): " << config_error_text(&configuration_) << std::endl;
-        }
-
-        config_destroy(&configuration_);
+    try {
+        configuration_.readFile(location_.c_str());
+    } catch (const libconfig::FileIOException & exception) {
+        std::cerr << "Configuration error (" << location_
+            << "): file not found" << std::endl;
+        return false;
+    } catch (const libconfig::ParseException & exception) {
+        std::cerr << "Configuration error (" << exception.getFile() << ":"
+            << exception.getLine() << "): " << exception.getError()
+            << std::endl;
         return false;
     }
 
@@ -65,51 +56,11 @@ bool Configuration::load(void) {
  */
 bool Configuration::isValidSection(const std::string section) const {
     assert(isLoaded_);
-    return config_lookup(&configuration_, section.c_str()) != nullptr;
-}
 
-/**
- * @param section Configuration section.
- * @param name Configuration name.
- * @param value Place to store the configuration value to.
- * @return True if the value has been loaded, false otherwise.
- */
-bool Configuration::getString(const std::string section,
-        const std::string name, std::string & value) const {
-    assert(isLoaded_);
-
-    const config_setting_t * const setting =
-        config_lookup(&configuration_, section.c_str());
-    if (setting == nullptr) {
+    try {
+        configuration_.lookup(section);
+        return true;
+    } catch (const libconfig::SettingNotFoundException &) {
         return false;
     }
-
-    const char * rawValue = nullptr;
-    if ((config_setting_lookup_string(setting, name.c_str(), &rawValue)
-            == CONFIG_FALSE) || rawValue == nullptr) {
-        return false;
-    }
-    value = std::string(rawValue);
-
-    return true;
-}
-
-/**
- * @param section Configuration section.
- * @param name Configuration name.
- * @param value Place to store the configuration value to.
- * @return True if the value has been loaded, false otherwise.
- */
-bool Configuration::getInteger(const std::string section,
-        const std::string name, int32_t & value) const {
-    assert(isLoaded_);
-
-    const config_setting_t * const setting =
-        config_lookup(&configuration_, section.c_str());
-    if (setting == nullptr) {
-        return false;
-    }
-
-    return config_setting_lookup_int(setting, name.c_str(), &value)
-        == CONFIG_TRUE;
 }

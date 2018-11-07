@@ -21,7 +21,7 @@ APP=aircontrol
 
 CC=g++
 CFLAGS=-std=c++14 -Wall -Wno-unused-result -Iinclude
-LDFLAGS=-lconfig -lwiringPi
+LDFLAGS=-lconfig++ -lwiringPi
 
 BIN_DIR=bin
 BUILD_DIR=build

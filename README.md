@@ -2,7 +2,7 @@
 
 ### **FEATURES**
 
-*  Send configurable patterns with manchester or RCO-compatible encoding through a 433,92 MHz transmitter.
+* Send configurable patterns with manchester or RCO-compatible encoding through a 433,92 MHz transmitter.
 * Air scan support in combination with a 433,92 MHz receiver for analyzing data streams. This can replace an oscilloscope if timing and code scheme are already known.
 * Configuration file support for easily addressing air targets.
 
@@ -12,7 +12,7 @@
 aircontrol needs to be compiled on a Raspberry Pi (or on a host with a compatible cross tool chain). The following libraries are needed:
 
 * **WiringPi**, see <http://wiringpi.com/download-and-install/>
-* **libconfig**, install with: `apt-get install libconfig-dev`
+* **libconfig++**, install with: `apt-get install libconfig++-dev`
 
 Run the following command to build aircontrol:
 > $ make
@@ -77,7 +77,7 @@ This section stores configuration defaults for all target sections.
                                _           _               _ 
     0  Manchester; values:  0)  |_    1) _|     s) _    S)
                                              _            ___
-    1  Remote Controlled Outlet; values: 0) | |___    1) |   |_
+    1  Remote Controlled Outlet; values:  0) | |___    1) |   |_
         (for reference: 00 -> 0, 11 -> 1, 01 -> F)
     
 

@@ -55,7 +55,7 @@ int32_t ScanParameters::getSamplingRate(void) const {
 bool ScanParameters::loadGpioPin(void) {
     int32_t value;
 
-    if (!configuration_.getInteger("scan", "gpioPin", value)) {
+    if (!configuration_.getValue("scan", "gpioPin", value)) {
         std::cerr << "Error: Missing configuration parameter 'gpioPin'."
             << std::endl;
         return false;
@@ -74,7 +74,7 @@ bool ScanParameters::loadGpioPin(void) {
 
 /// @return True if successful, false otherwise.
 bool ScanParameters::loadSamplingRate(void) {
-    if (!configuration_.getInteger("scan", "samplingRate", samplingRateUs_)) {
+    if (!configuration_.getValue("scan", "samplingRate", samplingRateUs_)) {
         std::cerr << "Error: Missing configuration parameter 'samplingRate'."
             << std::endl;
         return false;

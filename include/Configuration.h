@@ -19,17 +19,15 @@
 
 #pragma once
 
+#include <cassert>
 #include <cstdint>
 #include <string>
 
-#include <libconfig.h>
+#include <libconfig.h++>
 
 /// Class managing the program configuration.
 class Configuration {
 public:
-    /// Class destructor.
-    ~Configuration(void);
-
     /// Default configuration file location.
     static const std::string DEFAULT_LOCATION;
 
@@ -42,13 +40,20 @@ public:
     /// Check whether the given section exists.
     bool isValidSection(const std::string section) const;
 
-    /// Get the given string value.
-    bool getString(const std::string section, const std::string name,
-        std::string & value) const;
-
-    /// Get the given integer value.
-    bool getInteger(const std::string section, const std::string name,
-        int32_t & value) const;
+    /**
+     * @brief Get the requested configuration value.
+     * @tparam T Type of the value.
+     * @param section Configuration section.
+     * @param name Configuration name.
+     * @param value Place to store the configuration value to.
+     * @return True if the value has been loaded, false otherwise.
+     */
+    template <typename T>
+    bool getValue(const std::string section, const std::string name,
+            T & value) const {
+        assert(isLoaded_);
+        return configuration_.getRoot()[section].lookupValue(name, value);
+    }
 
 private:
     /// Absolute configuration file location.
@@ -58,5 +63,5 @@ private:
     bool isLoaded_ = false;
 
     /// Configuration data.
-    config_t configuration_;
+    libconfig::Config configuration_;
 };

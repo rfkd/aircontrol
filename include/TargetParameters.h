@@ -104,6 +104,25 @@ private:
      */
     int32_t sendDelayUs_;
 
+    /**
+     * @brief Get the requested configuration value from either the given
+     *        section or the "target" section.
+     * @copydoc Configuration::getValue()
+     */
+    template <typename T>
+    bool getValue(const std::string section, const std::string name,
+            T & value) const {
+        if (!configuration_.getValue(section, name, value)) {
+            if (!configuration_.getValue("target", name, value)) {
+                std::cerr << "Error: Missing configuration parameter '" << name
+                    << "'" << std::endl;
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     /// Load the GPIO pin from the configuration.
     bool loadGpioPin(void);
 

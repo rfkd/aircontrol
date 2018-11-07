@@ -98,17 +98,13 @@ int32_t TargetParameters::getSendDelay(void) const {
 bool TargetParameters::loadGpioPin(void) {
     int32_t value;
 
-    if (!configuration_.getInteger(name_, "gpioPin", value)) {
-        if (!configuration_.getInteger("target", "gpioPin", value)) {
-            std::cerr << "Error: Missing configuration parameter 'gpioPin'."
-                << std::endl;
-            return false;
-        }
+    if (!getValue(name_, "gpioPin", value)) {
+        return false;
     }
 
     if (!Task::isValidGpioPin(value)) {
         std::cerr << "Error: Configuration error (target " << name_
-            << "): gpioPin " << +gpioPin_ << " is invalid" << std::endl;
+            << "): gpioPin " << value << " is invalid" << std::endl;
         return false;
     }
 
@@ -119,12 +115,8 @@ bool TargetParameters::loadGpioPin(void) {
 
 /// @return True if successful, false otherwise.
 bool TargetParameters::loadDataLength(void) {
-    if (!configuration_.getInteger(name_, "dataLength", dataLengthUs_)) {
-        if (!configuration_.getInteger("target", "dataLength", dataLengthUs_)) {
-            std::cerr << "Error: Missing configuration parameter 'dataLength'."
-                << std::endl;
-            return false;
-        }
+    if (!getValue(name_, "dataLength", dataLengthUs_)) {
+        return false;
     }
 
     if (dataLengthUs_ == Types::INVALID_PARAMETER) {
@@ -142,12 +134,8 @@ bool TargetParameters::loadDataLength(void) {
 
 /// @return True if successful, false otherwise.
 bool TargetParameters::loadSyncLength(void) {
-    if (!configuration_.getInteger(name_, "syncLength", syncLengthUs_)) {
-        if (!configuration_.getInteger("target", "syncLength", syncLengthUs_)) {
-            std::cerr << "Error: Missing configuration parameter 'syncLength'."
-                << std::endl;
-            return false;
-        }
+    if (!getValue(name_, "syncLength", syncLengthUs_)) {
+        return false;
     }
 
     if (syncLengthUs_ == Types::INVALID_PARAMETER) {
@@ -167,12 +155,8 @@ bool TargetParameters::loadSyncLength(void) {
 bool TargetParameters::loadAirCode(void) {
     int32_t airCode;
 
-    if (!configuration_.getInteger(name_, "airCode", airCode)) {
-        if (!configuration_.getInteger("target", "airCode", airCode)) {
-            std::cerr << "Error: Missing configuration parameter 'airCode'."
-                << std::endl;
-            return false;
-        }
+    if (!getValue(name_, "airCode", airCode)) {
+        return false;
     }
     airCode_ = static_cast<Types::AirCode::AirCode_>(airCode);
 
@@ -187,12 +171,8 @@ bool TargetParameters::loadAirCode(void) {
 
 /// @return True if successful, false otherwise.
 bool TargetParameters::loadAirCommand(void) {
-    if (!configuration_.getString(name_, "airCommand", airCommand_)) {
-        if (!configuration_.getString("target", "airCommand", airCommand_)) {
-            std::cerr << "Error: Missing configuration parameter 'airCommand'."
-                << std::endl;
-            return false;
-        }
+    if (!getValue(name_, "airCommand", airCommand_)) {
+        return false;
     }
 
     if (airCommand_.length() == 0U) {
@@ -231,14 +211,8 @@ bool TargetParameters::loadAirCommand(void) {
 
 /// @return True if successful, false otherwise.
 bool TargetParameters::loadSendCommand(void) {
-    if (!configuration_.getInteger(name_, "sendCommand",
-            sendCommand_)) {
-        if (!configuration_.getInteger("target", "sendCommand",
-                sendCommand_)) {
-            std::cerr << "Error: Missing configuration parameter 'sendCommand'."
-                << std::endl;
-            return false;
-        }
+    if (!getValue(name_, "sendCommand", sendCommand_)) {
+        return false;
     }
 
     if (sendCommand_ == Types::INVALID_PARAMETER) {
@@ -256,14 +230,8 @@ bool TargetParameters::loadSendCommand(void) {
 
 /// @return True if successful, false otherwise.
 bool TargetParameters::loadSendDelay(void) {
-    if (!configuration_.getInteger(name_, "sendDelay",
-            sendDelayUs_)) {
-        if (!configuration_.getInteger("target", "sendDelay",
-                sendDelayUs_)) {
-            std::cerr << "Error: Missing configuration parameter 'sendDelay'."
-                << std::endl;
-            return false;
-        }
+    if (!getValue(name_, "sendDelay", sendDelayUs_)) {
+        return false;
     }
 
     if (sendDelayUs_ == Types::INVALID_PARAMETER) {
