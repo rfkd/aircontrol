@@ -28,15 +28,16 @@ BUILD_DIR=build
 ETC_DIR=etc
 SRC_DIR=source
 
-SRC := $(wildcard $(SRC_DIR)/*.cpp)
-OBJ=$(patsubst $(SRC_DIR)/%,$(BUILD_DIR)/%,$(SRC:.cpp=.o))
+SRC:=$(wildcard $(SRC_DIR)/*.cpp)
+OBJ:=$(patsubst $(SRC_DIR)/%,$(BUILD_DIR)/%,$(SRC:.cpp=.o))
+DEPS:=$(OBJ:.o=.d)
 
 $(BIN_DIR)/$(APP): pre-build scripts/version.sh $(OBJ)
 	$(CC) $(LDFLAGS) $(OBJ) -o $@
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(BUILD_DIR)
-	$(CC) -c $(CFLAGS) -o $@ $<
+	$(CC) -c $(CFLAGS) -MMD -MP -MF $(patsubst %.o,%.d,$@) -o $@ $<
 
 .PHONY: pre-build
 pre-build:
@@ -54,3 +55,5 @@ uninstall:
 .PHONY: clean
 clean:
 	rm -rf $(BUILD_DIR) $(BIN_DIR)/$(APP)
+
+-include $(DEPS)
