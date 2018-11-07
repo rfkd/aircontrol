@@ -23,8 +23,7 @@ Complete the installation as root (optional):
 The following command removes aircontrol and its configuration file:
 > \# make uninstall
 
-Please note that aircontrol needs to be executed as root for accessing the GPIO
-hardware.
+Please note that aircontrol needs to be executed as root for accessing the GPIO hardware.
 
 
 ### **COMMAND LINE PARAMETERS**

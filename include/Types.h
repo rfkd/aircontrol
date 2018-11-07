@@ -26,6 +26,7 @@ namespace Types {
 
 /// Supported radio frame encoding types.
 struct AirCode {
+    /// Supported radio frame encoding types.
     enum AirCode_ {
         MANCHESTER = 0,
         REMOTE_CONTROLLED_OUTLET = 1,

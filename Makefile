@@ -52,8 +52,14 @@ uninstall:
 	rm -f /usr/local/bin/$(APP)
 	rm -f /etc/$(APP).conf
 
+.PHONY: doc
+doc:
+	@echo Generating documentation...
+	@cd doxygen; doxygen Doxyfile
+
 .PHONY: clean
 clean:
 	rm -rf $(BUILD_DIR) $(BIN_DIR)/$(APP)
+	rm -rf Doxygen/html Doxygen/*.db
 
 -include $(DEPS)

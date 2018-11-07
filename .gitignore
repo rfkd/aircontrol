@@ -7,5 +7,9 @@
 bin
 build
 
+# Doxygen documentation
+doxygen/html
+doxygen/*.db
+
 # Automatically generated files
 include/Version.h
