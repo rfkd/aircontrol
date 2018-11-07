@@ -20,10 +20,12 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
+#include <vector>
 
 #include "Configuration.h"
+#include "ScanParameters.h"
 #include "Task.h"
-#include "Types.h"
 
 /// Class responsible for air scanning.
 class Scan : public Task {
@@ -41,9 +43,18 @@ private:
      */
     const int32_t durationMs_;
 
+    /// Scan parameters.
+    std::unique_ptr<ScanParameters> parameters_;
+
     /**
-     * @brief Delay between two samples when air scanning.
-     * @note Unit: microseconds
+     * @brief Vector containing the results of the air scan. A false element
+     *        indicates a low signal, a true element a high signal.
      */
-    //int32_t samplingRateUs_ = Types::INVALID_PARAMETER;
+    std::vector<bool> data_;
+
+    /// Perform the air scan and store the results in 'data_'.
+    void airScan(void);
+
+    /// Print the air scan results to stdout.
+    void printData(void) const;
 };

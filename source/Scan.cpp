@@ -20,6 +20,8 @@
 #include <cassert>
 #include <iostream>
 
+#include <wiringPi.h>
+
 #include "Scan.h"
 
 /**
@@ -28,12 +30,70 @@
  */
 Scan::Scan(Configuration & configuration, const int32_t durationMs) :
         Task(configuration),
-        durationMs_(durationMs) {
+        durationMs_(durationMs),
+        parameters_(nullptr),
+        data_() {
     // Do nothing
 }
 
 /// @return Program exit code.
 int Scan::start(void) {
-    std::cout << "Not yet implemented." << std::endl;
-    return EXIT_FAILURE;
+    assert(parameters_ == nullptr);
+    parameters_ = std::make_unique<ScanParameters>(
+        ScanParameters(configuration_));
+
+    // Load all parameters from the configuration
+    if (!parameters_->load()) {
+        return EXIT_FAILURE;
+    }
+
+    // Get GPIO from the parameters unless overridden from the command line
+    if (gpioPin_ == Types::INVALID_GPIO_PIN) {
+        gpioPin_ = parameters_->getGpioPin();
+    } else if (!isValidGpioPin(gpioPin_)) {
+        std::cerr << "Error: Given GPIO pin " << +gpioPin_ << " is invalid"
+            << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    // Perform the air scan and print the results
+    airScan();
+    printData();
+
+    return EXIT_SUCCESS;
+}
+
+void Scan::airScan(void) {
+    const int32_t MICROSECONDS_PER_MILLISECOND = 1000;
+    const int32_t SAMPLES = (durationMs_ * MICROSECONDS_PER_MILLISECOND)
+        / parameters_->getSamplingRate();
+
+    pinMode(gpioPin_, INPUT);
+
+    // Collect the data
+    data_.clear();
+    while (data_.size() < static_cast<size_t>(SAMPLES)) {
+        data_.push_back(digitalRead(gpioPin_) > 0);
+        delayMicroseconds(parameters_->getSamplingRate());
+    }
+}
+
+void Scan::printData(void) const {
+    bool previousData = false;
+
+    for (auto i = 0U; i < data_.size(); i++) {
+        if (data_.at(i)) {
+            if (!previousData) {
+                std::cout << "+----+" << std::endl;
+            }
+            std::cout << "     |" << std::endl;
+        } else {
+            if (previousData) {
+                std::cout << "+----+" << std::endl;
+            }
+            std::cout << "|" << std::endl;
+        }
+
+        previousData = data_.at(i);
+    }
 }
