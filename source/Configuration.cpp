@@ -24,6 +24,12 @@
 
 const std::string Configuration::DEFAULT_LOCATION = "/etc/aircontrol.conf";
 
+Configuration::~Configuration(void) {
+    if (isLoaded_) {
+        config_destroy(&configuration_);
+    }
+}
+
 /// @param location Absolute configuration file location.
 void Configuration::setLocation(const std::string & location) {
     location_ = location;
@@ -35,11 +41,15 @@ bool Configuration::load(void) {
     config_init(&configuration_);
 
     if (config_read_file(&configuration_, location_.c_str()) == CONFIG_FALSE) {
-        std::cerr << "Configuration error ("
-            << config_error_file(&configuration_)
-            << ":" << config_error_line(&configuration_)
-            << "): " << config_error_text(&configuration_)
-            << "." << std::endl;
+        if (config_error_file(&configuration_) == nullptr) {
+            std::cerr << "Configuration error (" << location_
+                << "): file not found" << std::endl;
+        } else {
+            std::cerr << "Configuration error ("
+                << config_error_file(&configuration_)
+                << ":" << config_error_line(&configuration_)
+                << "): " << config_error_text(&configuration_) << std::endl;
+        }
 
         config_destroy(&configuration_);
         return false;

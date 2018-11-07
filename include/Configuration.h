@@ -27,6 +27,9 @@
 /// Class managing the program configuration.
 class Configuration {
 public:
+    /// Class destructor.
+    ~Configuration(void);
+
     /// Default configuration file location.
     static const std::string DEFAULT_LOCATION;
 
