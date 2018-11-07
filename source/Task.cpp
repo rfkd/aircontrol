@@ -59,6 +59,5 @@ bool Task::isValidGpioPin(const uint8_t gpioPin) {
 
 /// @param gpioPin GPIO pin.
 void Task::setGpioPin(const uint8_t gpioPin) {
-    /// @todo Check whether the pin is valid!
     gpioPin_ = gpioPin;
 }

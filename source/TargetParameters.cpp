@@ -19,7 +19,6 @@
 
 #include <cassert>
 #include <iostream>
-#include <string.h>
 
 #include "TargetParameters.h"
 #include "Task.h"
@@ -201,16 +200,15 @@ bool TargetParameters::loadAirCommand(void) {
             << "): airCommand is undefined" << std::endl;
         return false;
     } else {
-        /// @todo Use std::string here.
-        const char * availableElements = nullptr;
+        std::string elements;
 
         switch (airCode_) {
             case Types::AirCode::MANCHESTER:
-                availableElements = strdup("01sS");
+                elements = "01sS";
                 break;
 
             case Types::AirCode::REMOTE_CONTROLLED_OUTLET:
-                availableElements = strdup("01");
+                elements = "01";
                 break;
 
             case Types::AirCode::MAX:
@@ -218,20 +216,13 @@ bool TargetParameters::loadAirCommand(void) {
                 assert(false);
                 break;
         }
-        assert(availableElements != nullptr);
 
-        for (uint32_t i = 0U; i < airCommand_.length(); i++) {
-            uint32_t j;
-            for (j = 0U; (j < strlen(availableElements))
-                && (airCommand_.c_str()[i] != availableElements[j]);
-                j++);
-            if (j == strlen(availableElements)) {
-                std::cerr << "Error: Configuration error (target "
-                    << name_
-                    << "): airCommand contains illegal character at position "
-                    << i+1 << std::endl;
-                return false;
-            }
+        const size_t position = airCommand_.find_first_not_of(elements);
+        if (position != std::string::npos) {
+            std::cerr << "Error: Configuration error (target " << name_
+                << "): airCommand contains illegal character at position "
+                << position+1 << std::endl;
+            return false;
         }
     }
 
