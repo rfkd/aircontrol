@@ -52,7 +52,11 @@ public:
     bool getValue(const std::string section, const std::string name,
             T & value) const {
         assert(isLoaded_);
-        return configuration_.getRoot()[section].lookupValue(name, value);
+        try {
+            return configuration_.getRoot()[section].lookupValue(name, value);
+        } catch (const libconfig::SettingNotFoundException &) {
+            return false;
+        }
     }
 
 private:

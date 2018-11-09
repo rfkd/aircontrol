@@ -23,11 +23,11 @@
 
 #include "Configuration.h"
 
-/// Class holding all parameters required for Scan tasks.
-class ScanParameters {
+/// Class holding all parameters required for Replay tasks.
+class ReplayParameters {
 public:
     /// Class constructor.
-    ScanParameters(const Configuration & configuration);
+    ReplayParameters(const Configuration & configuration);
 
     /**
      * @brief Load all required configuration parameters.
@@ -38,28 +38,13 @@ public:
     /// Get the GPIO pin.
     uint8_t getGpioPin(void) const;
 
-    /**
-     * @brief Get the delay between two scan samples.
-     * @note Unit: microseconds
-     */
-    int32_t getSamplingRate(void) const;
-
 private:
-    /// Reference of the related configuration instance.
+    /// Configuration data.
     const Configuration & configuration_;
 
     /// GPIO pin.
     uint8_t gpioPin_;
 
-    /**
-     * @brief Delay between two scan samples.
-     * @note Unit: microseconds
-     */
-    int32_t samplingRateUs_;
-
     /// Load the GPIO pin from the configuration.
     bool loadGpioPin(void);
-
-    /// Load the sampling rate parameter from the configuration.
-    bool loadSamplingRate(void);
 };

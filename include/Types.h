@@ -35,6 +35,9 @@ struct AirCode {
     };
 };
 
+/// Signature to be used to identify dump files.
+static const uint32_t DUMP_SIGNATURE = 0xDEADC0DEU;
+
 /// Invalid GPIO pin marker.
 static const uint8_t INVALID_GPIO_PIN = UINT8_MAX;
 

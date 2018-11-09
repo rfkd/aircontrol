@@ -68,11 +68,11 @@ public:
     int32_t getSendDelay(void) const;
 
 private:
-    /// Reference of the related target instance.
+    /// Reference of the related configuration instance.
     const Configuration & configuration_;
 
     /// Reference of the target name.
-    const std::string & name_;
+    const std::string name_;
 
     /// GPIO pin.
     uint8_t gpioPin_;

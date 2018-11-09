@@ -19,7 +19,6 @@
 
 #include <cassert>
 #include <iostream>
-#include <string.h>
 
 #include "ScanParameters.h"
 #include "Task.h"
@@ -62,7 +61,7 @@ bool ScanParameters::loadGpioPin(void) {
     }
 
     if (!Task::isValidGpioPin(value)) {
-        std::cerr << "Error: Configuration error (scan): gpioPin " << +gpioPin_
+        std::cerr << "Error: Configuration error (scan): gpioPin " << value
             << " is invalid" << std::endl;
         return false;
     }

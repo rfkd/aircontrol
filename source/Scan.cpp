@@ -18,7 +18,10 @@
  */
 
 #include <cassert>
+#include <fstream>
 #include <iostream>
+#include <string.h>
+#include <unistd.h>
 
 #include <wiringPi.h>
 
@@ -27,10 +30,14 @@
 /**
  * @param configuration Reference of the configuration.
  * @param durationMs Air scan duration (unit: milliseconds).
+ * @param dumpFile Reference of the dump file. Can be an empty string to dump
+ *                 human readable ASCII output to stdout.
  */
-Scan::Scan(Configuration & configuration, const int32_t durationMs) :
+Scan::Scan(Configuration & configuration, const int32_t durationMs,
+        const std::string & dumpFile) :
         Task(configuration),
         durationMs_(durationMs),
+        dumpFile_(dumpFile),
         parameters_(nullptr),
         data_() {
     // Do nothing
@@ -56,9 +63,13 @@ int Scan::start(void) {
         return EXIT_FAILURE;
     }
 
-    // Perform the air scan and print the results
+    // Perform the air scan and process the results
     airScan();
-    printData();
+    if (dumpFile_.length() == 0U) {
+        printData();
+    } else {
+        serializeData();
+    }
 
     return EXIT_SUCCESS;
 }
@@ -74,7 +85,7 @@ void Scan::airScan(void) {
     data_.clear();
     while (data_.size() < static_cast<size_t>(SAMPLES)) {
         data_.push_back(digitalRead(gpioPin_) > 0);
-        delayMicroseconds(parameters_->getSamplingRate());
+        usleep(parameters_->getSamplingRate());
     }
 }
 
@@ -96,4 +107,56 @@ void Scan::printData(void) const {
 
         previousData = data_.at(i);
     }
+}
+
+/**
+ * Format of the serialized file:
+ * - [4 bytes] Signature
+ * - [4 bytes] Sampling rate (unit: microseconds)
+ * - [n bytes] Sample data, 1 byte each, 0=low / 1=high
+ */
+void Scan::serializeData(void) const {
+    std::ofstream dumpFile;
+
+    assert(dumpFile_.length() > 0U);
+
+    // Open dump file
+    dumpFile.open(dumpFile_, std::ios::out | std::ios::binary
+        | std::ios::trunc);
+    if (!dumpFile.is_open()) {
+        std::cerr << "Error: Dump file '" << dumpFile_ << "' cannot be opened "
+            "for writing: " << strerror(errno) << std::endl;
+        return;
+    }
+
+    // Write signature
+    if (!dumpFile.write(reinterpret_cast<const char *>(&Types::DUMP_SIGNATURE),
+            sizeof(Types::DUMP_SIGNATURE))) {
+        std::cerr << "Error: Unable to write signature to dump file: "
+            << strerror(errno) << std::endl;
+        return;
+    }
+
+    // Write sampling rate
+    const int32_t samplingRate = parameters_->getSamplingRate();
+    if (!dumpFile.write(reinterpret_cast<const char *>(&samplingRate),
+            sizeof(samplingRate))) {
+        std::cerr << "Error: Unable to write sampling rate to dump file: "
+            << strerror(errno) << std::endl;
+        return;
+    }
+
+    // Write sample data
+    for (auto i = 0U; i < data_.size(); i++) {
+        const char data = static_cast<char>(data_.at(i));
+        if (!dumpFile.write(&data, sizeof(data))) {
+            std::cerr << "Error: Unable to write data to dump file: "
+                << strerror(errno) << std::endl;
+            return;
+        }
+    }
+
+    // Clean up
+    std::cout << "Air scan results dumped successfully to file '" << dumpFile_
+        << "'." << std::endl;
 }
