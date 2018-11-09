@@ -3,7 +3,8 @@
 ### **FEATURES**
 
 * Send configurable radio frames with different encodings through a radio transmitter supported by [WiringPi](http://wiringpi.com/).
-* Wireless scanning support in combination with a radio receiver for analyzing and reproducing radio frames.
+* Wireless scanning support in combination with a radio receiver for analyzing and replaying radio frames.
+* Record and replay radio frames to easily control air targets without having to decode the protocol.
 * Configuration file support for easily addressing air targets.
 
 
