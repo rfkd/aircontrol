@@ -78,6 +78,8 @@ void Replay::airReplay(void) const {
         digitalWrite(gpioPin_, data_.at(i) ? HIGH : LOW);
         usleep(samplingRateUs_);
     }
+
+    pinMode(gpioPin_, INPUT);
 }
 
 /**
