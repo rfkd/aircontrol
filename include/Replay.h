@@ -19,37 +19,29 @@
 
 #pragma once
 
-#include <string>
+#include <cstdint>
+#include <memory>
+#include <vector>
 
 #include "Configuration.h"
+#include "ReplayParameters.h"
+#include "Task.h"
 
-/// Class holding all parameters required for Scan tasks.
-class ScanParameters {
+/// Class responsible for replaying air scan dumps.
+class Replay : public Task {
 public:
     /// Class constructor.
-    ScanParameters(const Configuration & configuration);
+    Replay(Configuration & configuration, const std::string & dumpFile);
 
-    /**
-     * @brief Load all required configuration parameters.
-     * @note Must be called before any of the getters.
-     */
-    bool load(void);
-
-    /// Get the GPIO pin.
-    uint8_t getGpioPin(void) const;
-
-    /**
-     * @brief Get the delay between two scan samples.
-     * @note Unit: microseconds
-     */
-    int32_t getSamplingRate(void) const;
+    /// Start replaying the air dump scan.
+    int start(void) final;
 
 private:
-    /// Reference of the related configuration instance.
-    const Configuration & configuration_;
+    /// File name of the air scan dump.
+    const std::string dumpFile_;
 
-    /// GPIO pin.
-    uint8_t gpioPin_;
+    /// Replay parameters.
+    std::unique_ptr<ReplayParameters> parameters_;
 
     /**
      * @brief Delay between two scan samples.
@@ -57,9 +49,15 @@ private:
      */
     int32_t samplingRateUs_;
 
-    /// Load the GPIO pin from the configuration.
-    bool loadGpioPin(void);
+    /**
+     * @brief Storage for the air scan dump data. A false element indicates a
+     *        low signal, a true element a high signal.
+     */
+    std::vector<bool> data_;
 
-    /// Load the sampling rate parameter from the configuration.
-    bool loadSamplingRate(void);
+    /// Perform the air scan replay based on the values stored in 'data_'.
+    void airReplay(void) const;
+
+    /// Deserialize the air scan dump data from the dump file.
+    bool deserializeData(void);
 };

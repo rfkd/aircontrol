@@ -43,7 +43,7 @@ private:
     std::unique_ptr<TargetParameters> parameters_;
 
     /// Control the target.
-    void control(void) const;
+    void airControl(void) const;
 
     /// Send the air command with Manchester encoding.
     void sendAirCommandManchester(void) const;

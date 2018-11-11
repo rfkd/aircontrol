@@ -31,7 +31,8 @@
 class Scan : public Task {
 public:
     /// Class constructor.
-    Scan(Configuration & configuration, const int32_t durationMs);
+    Scan(Configuration & configuration, const int32_t durationMs,
+        const std::string & dumpFile);
 
     /// Start the air scan.
     int start(void) final;
@@ -42,6 +43,9 @@ private:
      * @note Unit: milliseconds
      */
     const int32_t durationMs_;
+
+    /// Dump file name or empty string to print scan results on stdout.
+    const std::string dumpFile_;
 
     /// Scan parameters.
     std::unique_ptr<ScanParameters> parameters_;
@@ -57,4 +61,7 @@ private:
 
     /// Print the air scan results to stdout.
     void printData(void) const;
+
+    /// Serialize the air scan results to the dump file.
+    void serializeData(void) const;
 };

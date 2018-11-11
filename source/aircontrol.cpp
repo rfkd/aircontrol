@@ -26,6 +26,7 @@
 
 #include "Configuration.h"
 #include "InstanceLock.h"
+#include "Replay.h"
 #include "Scan.h"
 #include "Target.h"
 #include "Task.h"
@@ -37,12 +38,17 @@ static void printUsage(void) {
     std::cout << std::endl
         << "aircontrol " << VERSION << std::endl
         << std::endl
-        << "Usage: aircontrol <options>" << std::endl
+        << "Usage: aircontrol [options] <command>" << std::endl
+        << std::endl
         << "Available options:" << std::endl
         << "  -c <file>\tConfiguration file ["
         << Configuration::DEFAULT_LOCATION << "]" << std::endl
+        << "  -d <file>\tDump air scan results to file" << std::endl
         << "  -g <pin>\tOverride GPIO pin from configuration" << std::endl
         << "  -l\t\tPrevent multiple program instances" << std::endl
+        << std::endl
+        << "Available commands:" << std::endl
+        << "  -r <file>\tReplay given air scan dump" << std::endl
         << "  -s <ms>\tAir scan for given period" << std::endl
         << "  -t <target>\tExecute target configuration" << std::endl
         << std::endl
@@ -60,14 +66,24 @@ int main(int argc, char **argv) {
     Configuration configuration;
     std::unique_ptr<Task> task;
     uint8_t gpio = Types::INVALID_GPIO_PIN;
+    std::string dumpFile;
 
     // Parse command line arguments
     int option;
     opterr = 0;
-    while ((option = getopt(argc, argv, "c:g:ls:t:")) != -1) {
+    while ((option = getopt(argc, argv, "c:d:g:lr:s:t:")) != -1) {
         switch (option) {
             case 'c':
                 configuration.setLocation(std::string(optarg));
+                break;
+
+            case 'd':
+                if (task != nullptr) {
+                    std::cerr << "Error: Parameter '-d' is an option and must "
+                        "be placed before the command" << std::endl;
+                    return EXIT_FAILURE;
+                }
+                dumpFile = std::string(optarg);
                 break;
 
             case 'g':
@@ -78,24 +94,34 @@ int main(int argc, char **argv) {
                 InstanceLock::lock();
                 break;
 
+            case 'r':
+                if (task != nullptr) {
+                    std::cerr << "Error: Multiple commands are not supported "
+                        "(maybe omit parameter '-r')" << std::endl;
+                    return EXIT_FAILURE;
+                }
+                task = std::make_unique<Replay>(Replay(configuration,
+                    std::string(optarg)));
+                break;
+
             case 's':
                 if (atoi(optarg) == 0) {
-                    std::cerr << "Error: Air scan duration must be >0ms."
+                    std::cerr << "Error: Air scan duration must be >0ms"
                         << std::endl;
                     return EXIT_FAILURE;
                 } else if (task != nullptr) {
-                    std::cerr << "Error: Parallel tasks are not supported "
-                        "(omit parameter '-s')." << std::endl;
+                    std::cerr << "Error: Multiple commands are not supported "
+                        "(maybe omit parameter '-s')" << std::endl;
                     return EXIT_FAILURE;
                 }
                 task = std::make_unique<Scan>(Scan(configuration,
-                    atoi(optarg)));
+                    atoi(optarg), dumpFile));
                 break;
 
             case 't':
                 if (task != nullptr) {
-                    std::cerr << "Error: Parallel tasks are not supported "
-                        "(omit parameter '-t')." << std::endl;
+                    std::cerr << "Error: Multiple commands are not supported "
+                        "(maybe omit parameter '-t')" << std::endl;
                     return EXIT_FAILURE;
                 }
                 task = std::make_unique<Target>(Target(configuration,
@@ -108,7 +134,7 @@ int main(int argc, char **argv) {
         }
     }
     if (task == nullptr) {
-        std::cerr << "Error: Either parameter '-s' or '-t' is mandatory."
+        std::cerr << "Error: Either parameter '-r', '-s' or '-t' is mandatory"
             << std::endl;
         printUsage();
         return EXIT_FAILURE;

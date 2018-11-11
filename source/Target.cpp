@@ -64,12 +64,12 @@ int Target::start(void) {
     }
 
     // Send the radio frame to control the target
-    control();
+    airControl();
 
     return EXIT_SUCCESS;
 }
 
-void Target::control(void) const {
+void Target::airControl(void) const {
     void (Target::*sendAirCommand)(void) const = nullptr;
 
     switch (parameters_->getAirCode()) {
@@ -101,6 +101,8 @@ void Target::control(void) const {
             usleep(parameters_->getSendDelay());
         }
     }
+
+    pinMode(gpioPin_, INPUT);
 }
 
 
