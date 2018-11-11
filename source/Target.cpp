@@ -101,6 +101,8 @@ void Target::airControl(void) const {
             usleep(parameters_->getSendDelay());
         }
     }
+
+    pinMode(gpioPin_, INPUT);
 }
 
 
