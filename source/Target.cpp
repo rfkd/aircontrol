@@ -63,17 +63,26 @@ int Target::start(void) {
         return EXIT_FAILURE;
     }
 
-    // Prepare hardware
-    pinMode(gpioPin_, OUTPUT);
+    // Send the radio frame to control the target
+    control();
 
-    // Control the target
+    return EXIT_SUCCESS;
+}
+
+void Target::control(void) const {
+    void (Target::*sendAirCommand)(void) const = nullptr;
+
     switch (parameters_->getAirCode()) {
         case Types::AirCode::MANCHESTER:
-            controlManchester();
+            sendAirCommand = &Target::sendAirCommandManchester;
             break;
 
         case Types::AirCode::REMOTE_CONTROLLED_OUTLET:
-            controlRemoteControlledOutled();
+            sendAirCommand = &Target::sendAirCommandRemoteControlledOutled;
+            break;
+
+        case Types::AirCode::TORMATIC:
+            sendAirCommand = &Target::sendAirCommandTormatic;
             break;
 
         case Types::AirCode::MAX:
@@ -82,78 +91,101 @@ int Target::start(void) {
             break;
     }
 
-    return EXIT_SUCCESS;
-}
+    pinMode(gpioPin_, OUTPUT);
 
-void Target::controlManchester(void) const {
-    assert(parameters_->getAirCode() == Types::AirCode::MANCHESTER);
+    for (auto n = 0; n < parameters_->getSendCommand(); n++) {
+        (this->*sendAirCommand)();
 
-    for (int32_t n = 0; n < parameters_->getSendCommand(); n++) {
-        digitalWrite(gpioPin_, LOW);
-
-        for (uint32_t i = 0U; i < parameters_->getAirCommand().length(); i++) {
-            switch (parameters_->getAirCommand().at(i)) {
-                case 's':
-                    digitalWrite(gpioPin_, LOW);
-                    usleep(parameters_->getSyncLength());
-                    break;
-
-                case 'S':
-                    digitalWrite(gpioPin_, HIGH);
-                    usleep(parameters_->getSyncLength());
-                    break;
-
-                case '0':
-                    // Falling edge in the middle of the pulse
-                    digitalWrite(gpioPin_, HIGH);
-                    usleep(parameters_->getDataLength() / 2);
-                    digitalWrite(gpioPin_, LOW);
-                    usleep(parameters_->getDataLength() / 2);
-                    break;
-
-                case '1':
-                    // Rising edge in the middle of the pulse
-                    digitalWrite(gpioPin_, LOW);
-                    usleep(parameters_->getDataLength() / 2);
-                    digitalWrite(gpioPin_, HIGH);
-                    usleep(parameters_->getDataLength() / 2);
-                    break;
-            }
-        }
-        digitalWrite(gpioPin_, LOW);
-
-        if (n != parameters_->getSendCommand() - 1)
+        if (n != parameters_->getSendCommand() - 1) {
+            digitalWrite(gpioPin_, LOW);
             usleep(parameters_->getSendDelay());
+        }
     }
 }
 
-void Target::controlRemoteControlledOutled(void) const {
+
+void Target::sendAirCommandManchester(void) const {
+    assert(parameters_->getAirCode() == Types::AirCode::MANCHESTER);
+
+    for (auto i = 0U; i < parameters_->getAirCommand().length(); i++) {
+        switch (parameters_->getAirCommand().at(i)) {
+            case 's':
+                digitalWrite(gpioPin_, LOW);
+                usleep(parameters_->getSyncLength());
+                break;
+
+            case 'S':
+                digitalWrite(gpioPin_, HIGH);
+                usleep(parameters_->getSyncLength());
+                break;
+
+            case '0':
+                // Falling edge in the middle of the pulse
+                digitalWrite(gpioPin_, HIGH);
+                usleep(parameters_->getDataLength() / 2);
+                digitalWrite(gpioPin_, LOW);
+                usleep(parameters_->getDataLength() / 2);
+                break;
+
+            case '1':
+                // Rising edge in the middle of the pulse
+                digitalWrite(gpioPin_, LOW);
+                usleep(parameters_->getDataLength() / 2);
+                digitalWrite(gpioPin_, HIGH);
+                usleep(parameters_->getDataLength() / 2);
+                break;
+        }
+    }
+}
+
+void Target::sendAirCommandRemoteControlledOutled(void) const {
     assert(parameters_->getAirCode()
         == Types::AirCode::REMOTE_CONTROLLED_OUTLET);
 
-    for (int32_t n = 0; n < parameters_->getSendCommand(); n++) {
-        digitalWrite(gpioPin_, LOW);
+    for (auto i = 0U; i < parameters_->getAirCommand().length(); i++) {
+        switch (parameters_->getAirCommand().at(i)) {
+            case '0':
+                // Falling edge after 25% of the pulse
+                digitalWrite(gpioPin_, HIGH);
+                usleep(parameters_->getDataLength() / 4);
+                digitalWrite(gpioPin_, LOW);
+                usleep((parameters_->getDataLength() / 4) * 3);
+                break;
 
-        for (uint32_t i = 0U; i < parameters_->getAirCommand().length(); i++) {
-            digitalWrite(gpioPin_, HIGH);
-            switch (parameters_->getAirCommand().at(i)) {
-                case '0':
-                    // Falling edge after 25% of the pulse
-                    usleep(parameters_->getDataLength() / 4);
-                    digitalWrite(gpioPin_, LOW);
-                    usleep((parameters_->getDataLength() / 4) * 3);
-                    break;
-
-                case '1':
-                    // Falling edge after 75% of the pulse
-                    usleep((parameters_->getDataLength() / 4) * 3);
-                    digitalWrite(gpioPin_, LOW);
-                    usleep(parameters_->getDataLength() / 4);
-                    break;
-            }
+            case '1':
+                // Falling edge after 75% of the pulse
+                digitalWrite(gpioPin_, HIGH);
+                usleep((parameters_->getDataLength() / 4) * 3);
+                digitalWrite(gpioPin_, LOW);
+                usleep(parameters_->getDataLength() / 4);
+                break;
         }
+    }
+}
 
-        if (n != parameters_->getSendCommand() - 1)
-            usleep(parameters_->getSendDelay());
+void Target::sendAirCommandTormatic(void) const {
+    assert(parameters_->getAirCode() == Types::AirCode::TORMATIC);
+
+    for (auto i = 0U; i < parameters_->getAirCommand().length(); i++) {
+        switch (parameters_->getAirCommand().at(i)) {
+            case '0':
+                // Falling edge after 33% of the pulse
+                digitalWrite(gpioPin_, HIGH);
+                usleep(parameters_->getDataLength() / 3);
+                digitalWrite(gpioPin_, LOW);
+                usleep((parameters_->getDataLength() / 3) * 2);
+                break;
+
+            case '1':
+                // Falling edge after 33% of the pulse, another rising edge
+                // after 66%
+                digitalWrite(gpioPin_, HIGH);
+                usleep(parameters_->getDataLength() / 3);
+                digitalWrite(gpioPin_, LOW);
+                usleep(parameters_->getDataLength() / 3);
+                digitalWrite(gpioPin_, HIGH);
+                usleep(parameters_->getDataLength() / 3);
+                break;
+        }
     }
 }

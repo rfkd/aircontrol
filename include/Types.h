@@ -30,6 +30,7 @@ struct AirCode {
     enum AirCode_ {
         MANCHESTER = 0,
         REMOTE_CONTROLLED_OUTLET = 1,
+        TORMATIC = 2,
         MAX
     };
 };
