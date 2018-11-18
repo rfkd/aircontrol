@@ -28,7 +28,7 @@ BUILD_DIR=build
 ETC_DIR=etc
 SRC_DIR=source
 
-INSTALL_DIR=/usr/local/bin/
+INSTALL_DIR=/usr/local/bin
 
 SRC:=$(wildcard $(SRC_DIR)/*.cpp)
 OBJ:=$(patsubst $(SRC_DIR)/%,$(BUILD_DIR)/%,$(SRC:.cpp=.o))
@@ -46,13 +46,13 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 pre-build:
 	@sh scripts/version.sh
 
-install: all
+install: $(BIN_DIR)/$(APP)
 	cp $(BIN_DIR)/$(APP) $(INSTALL_DIR)
 	cp -n $(ETC_DIR)/$(APP).conf /etc/
 
 uninstall:
 	rm -f $(INSTALL_DIR)/$(APP)
-	cmp --silent $(ETC_DIR)/$(APP).conf /etc/$(APP).conf && rm -f /etc/$(APP).conf
+	cmp --silent $(ETC_DIR)/$(APP).conf /etc/$(APP).conf && rm -f /etc/$(APP).conf || true
 
 .PHONY: doc
 doc:
