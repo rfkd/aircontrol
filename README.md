@@ -26,29 +26,39 @@ aircontrol needs to be compiled on a Raspberry Pi (or on a host with a compatibl
 The following libraries are needed:
 
 * **WiringPi**, see <http://wiringpi.com/download-and-install/>
-* **libconfig++**, install with: `apt-get install libconfig++-dev`
+* **libconfig++**, as root install with: `apt-get install libconfig++-dev`
 
 Perform the following steps to compile and install aircontrol:
 
 1. Clone the aircontrol repository. The **master** branch contains stable versions while the **develop** branch contains a current development snapshot with the latest features and fixes.
 
    To get the latest stable version from the **master** branch run:
-   `$ git clone -b master https://github.com/rfkd/aircontrol.git`
+   ```
+   $ git clone -b master https://github.com/rfkd/aircontrol.git
+   ```
    
    To get the latest development version from the **develop** branch run:
-    `$ git clone https://github.com/rfkd/aircontrol.git`
+   ```
+   $ git clone https://github.com/rfkd/aircontrol.git
+   ```
 
 2. Enter the cloned directory and build aircontrol:
-   `$ cd aircontrol`
-   `$ make`
+   ```
+   $ cd aircontrol
+   $ make
+   ```
 
 3. Complete the installation as root (optional):
-   `# make install`
+   ```
+   # make install
+   ```
    
    **Note:** An already existing configuration file will not be overwritten.
 
 To remove aircontrol and its configuration file (if it hasn't changed) run:
-   `# make uninstall`
+```
+# make uninstall
+```
 
 **Note:** aircontrol needs to be executed as root for accessing the GPIO hardware.
 
