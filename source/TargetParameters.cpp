@@ -193,6 +193,10 @@ bool TargetParameters::loadAirCommand(void) {
                 elements = "01";
                 break;
 
+            case Types::AirCode::MELITEC:
+                elements = "0S";
+                break;
+
             case Types::AirCode::MAX:
             default:
                 assert(false);
