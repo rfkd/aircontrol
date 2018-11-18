@@ -12,6 +12,7 @@
 
 The following devices have been confirmed to work with aircontrol: 
 * ELRO AB440S and many similar wireless outlets (encoding type: Remote Controlled Outlet)
+* Melitec lights (encoding type: Melitec)
 * Tormatic garage doors (encoding type: Tormatic)
 * Warema EWFS based devices, e.g. shutters (encoding type: Manchester)
 * WOFI FC-66 controlled lamps (encoding type: Remote Controlled Outlet) 
@@ -106,7 +107,8 @@ This section stores configuration defaults for all target sections.
         (for reference: 00 -> 0, 11 -> 1, 01 -> F)
                      _          _   _
     2  Tormatic:  0)  |__    1)  |_| 
-
+                    _          __
+    3  Melitec:  0)  |__    S)   |_
 
 `airCommand` &nbsp; Sequence of values to be transmitted. The accepted values of this parameter are defined by airCode. Example: `airCode = 0; airCommand = "sss010011SSS";`
 

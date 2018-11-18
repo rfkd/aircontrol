@@ -31,6 +31,7 @@ struct AirCode {
         MANCHESTER = 0,
         REMOTE_CONTROLLED_OUTLET = 1,
         TORMATIC = 2,
+        MELITEC = 3,
         MAX
     };
 };

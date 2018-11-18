@@ -53,4 +53,7 @@ private:
 
     /// Send the air command with Tormatic encoding.
     void sendAirCommandTormatic(void) const;
+
+    /// Send the air command with Melitec encoding.
+    void sendAirCommandMelitec(void) const;
 };

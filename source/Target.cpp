@@ -85,6 +85,10 @@ void Target::airControl(void) const {
             sendAirCommand = &Target::sendAirCommandTormatic;
             break;
 
+        case Types::AirCode::MELITEC:
+            sendAirCommand = &Target::sendAirCommandMelitec;
+            break;
+
         case Types::AirCode::MAX:
         default:
             assert(false);
@@ -187,6 +191,30 @@ void Target::sendAirCommandTormatic(void) const {
                 usleep(parameters_->getDataLength() / 3);
                 digitalWrite(gpioPin_, HIGH);
                 usleep(parameters_->getDataLength() / 3);
+                break;
+        }
+    }
+}
+
+void Target::sendAirCommandMelitec(void) const {
+    assert(parameters_->getAirCode() == Types::AirCode::MELITEC);
+
+    for (auto i = 0U; i < parameters_->getAirCommand().length(); i++) {
+        switch (parameters_->getAirCommand().at(i)) {
+            case '0':
+                // Falling edge after 33% of the pulse
+                digitalWrite(gpioPin_, HIGH);
+                usleep(parameters_->getDataLength() / 3);
+                digitalWrite(gpioPin_, LOW);
+                usleep((parameters_->getDataLength() / 3) * 2);
+                break;
+
+            case 'S':
+                // Falling edge after 66% of the pulse
+                digitalWrite(gpioPin_, HIGH);
+                usleep((parameters_->getSyncLength() / 3) * 2);
+                digitalWrite(gpioPin_, LOW);
+                usleep(parameters_->getSyncLength() / 3);
                 break;
         }
     }
