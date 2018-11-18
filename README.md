@@ -150,7 +150,11 @@ The actual target sections can be named freely, they incorporate all defaults fr
 aircontrol is able to record radio frames while scanning into a so called air scan dump file. This file can be used later to replay the recorded radio frames, see the following example:
 
 Air scan for 1000ms and dump the results to `example.asd`:
-> \# aircontrol -d example.asd -s 1000
+```
+# aircontrol -d example.asd -s 1000
+```
 
 Replay the previously recorded air scan dump `example.asd`:
-> \# aircontrol -r example.asd
+```
+# aircontrol -r example.asd
+```
