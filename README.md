@@ -22,21 +22,45 @@ If you are controlling other devices with aircontrol please let me know.
 
 ### **INSTALLATION**
 
-aircontrol needs to be compiled on a Raspberry Pi (or on a host with a compatible cross tool chain). The following libraries are needed:
+aircontrol needs to be compiled on a Raspberry Pi (or on a host with a compatible cross tool chain).
+The following libraries are needed:
 
 * **WiringPi**, see <http://wiringpi.com/download-and-install/>
-* **libconfig++**, install with: `apt-get install libconfig++-dev`
+* **libconfig++**, as root install with: `apt-get install libconfig++-dev`
 
-Run the following command to build aircontrol:
-> $ make
+Perform the following steps to compile and install aircontrol:
 
-Complete the installation as root (optional):
-> \# make install
+1. Clone the aircontrol repository. The **master** branch contains stable versions while the **develop** branch contains a current development snapshot with the latest features and fixes.
 
-The following command removes aircontrol and its configuration file:
-> \# make uninstall
+   To get the latest stable version from the **master** branch run:
+   ```
+   $ git clone -b master https://github.com/rfkd/aircontrol.git
+   ```
+   
+   To get the latest development version from the **develop** branch run:
+   ```
+   $ git clone https://github.com/rfkd/aircontrol.git
+   ```
 
-Please note that aircontrol needs to be executed as root for accessing the GPIO hardware.
+2. Enter the cloned directory and build aircontrol:
+   ```
+   $ cd aircontrol
+   $ make
+   ```
+
+3. Complete the installation as root (optional):
+   ```
+   # make install
+   ```
+   
+   **Note:** An already existing configuration file will not be overwritten.
+
+To remove aircontrol and its configuration file (if it hasn't changed) run:
+```
+# make uninstall
+```
+
+**Note:** aircontrol needs to be executed as root for accessing the GPIO hardware.
 
 
 ### **COMMAND LINE PARAMETERS**
@@ -126,7 +150,11 @@ The actual target sections can be named freely, they incorporate all defaults fr
 aircontrol is able to record radio frames while scanning into a so called air scan dump file. This file can be used later to replay the recorded radio frames, see the following example:
 
 Air scan for 1000ms and dump the results to `example.asd`:
-> \# aircontrol -d example.asd -s 1000
+```
+# aircontrol -d example.asd -s 1000
+```
 
 Replay the previously recorded air scan dump `example.asd`:
-> \# aircontrol -r example.asd
+```
+# aircontrol -r example.asd
+```

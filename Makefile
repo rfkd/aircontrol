@@ -28,6 +28,8 @@ BUILD_DIR=build
 ETC_DIR=etc
 SRC_DIR=source
 
+INSTALL_DIR=/usr/local/bin/
+
 SRC:=$(wildcard $(SRC_DIR)/*.cpp)
 OBJ:=$(patsubst $(SRC_DIR)/%,$(BUILD_DIR)/%,$(SRC:.cpp=.o))
 DEPS:=$(OBJ:.o=.d)
@@ -45,16 +47,15 @@ pre-build:
 	@sh scripts/version.sh
 
 install: all
-	cp $(BIN_DIR)/$(APP) /usr/local/bin/
-	cp $(ETC_DIR)/$(APP).conf /etc/
+	cp $(BIN_DIR)/$(APP) $(INSTALL_DIR)
+	cp -n $(ETC_DIR)/$(APP).conf /etc/
 
 uninstall:
-	rm -f /usr/local/bin/$(APP)
-	rm -f /etc/$(APP).conf
+	rm -f $(INSTALL_DIR)/$(APP)
+	cmp --silent $(ETC_DIR)/$(APP).conf /etc/$(APP).conf && rm -f /etc/$(APP).conf
 
 .PHONY: doc
 doc:
-	@echo Generating documentation...
 	@cd doxygen; doxygen Doxyfile
 
 .PHONY: clean
