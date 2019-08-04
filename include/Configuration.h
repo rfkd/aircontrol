@@ -53,7 +53,8 @@ public:
             T & value) const {
         assert(isLoaded_);
         try {
-            return configuration_.getRoot()[section].lookupValue(name, value);
+            return configuration_.getRoot()[section.c_str()].lookupValue(
+                name, value);
         } catch (const libconfig::SettingNotFoundException &) {
             return false;
         }
