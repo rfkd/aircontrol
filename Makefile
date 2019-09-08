@@ -1,7 +1,7 @@
 #
 # This file is part of aircontrol.
 # 
-# Copyright (C) 2014-2018 Ralf Dauberschmidt <ralf@dauberschmidt.de>
+# Copyright (C) 2014-2019 Ralf Dauberschmidt <ralf@dauberschmidt.de>
 # 
 # aircontrol is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
