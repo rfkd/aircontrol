@@ -1,7 +1,7 @@
 #
 # This file is part of aircontrol.
 # 
-# Copyright (C) 2014-2019 Ralf Dauberschmidt <ralf@dauberschmidt.de>
+# Copyright (C) 2014-2022 Ralf Dauberschmidt <ralf@dauberschmidt.de>
 # 
 # aircontrol is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ DEPS:=$(OBJ:.o=.d)
 
 $(BIN_DIR)/$(APP): pre-build scripts/version.sh $(OBJ)
 	@mkdir -p $(BIN_DIR)
-	$(CC) $(LDFLAGS) $(OBJ) -o $@
+	$(CC) -o $@ $(OBJ) $(LDFLAGS)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(BUILD_DIR)
