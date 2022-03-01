@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file. The format 
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- Fix linker command line argument order in Makefile
 
 ## [0.2.0] - 2019-09-08
 ### Added

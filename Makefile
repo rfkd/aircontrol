@@ -36,7 +36,7 @@ DEPS:=$(OBJ:.o=.d)
 
 $(BIN_DIR)/$(APP): pre-build scripts/version.sh $(OBJ)
 	@mkdir -p $(BIN_DIR)
-	$(CC) $(LDFLAGS) $(OBJ) -o $@
+	$(CC) -o $@ $(OBJ) $(LDFLAGS)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(BUILD_DIR)
