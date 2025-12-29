@@ -25,8 +25,8 @@ If you are controlling other devices with aircontrol please let me know.
 aircontrol needs to be compiled on a Raspberry Pi (or on a host with a compatible cross tool chain).
 The following libraries are needed:
 
-* **[WiringPi](http://wiringpi.com)**, as root install with: `apt-get install wiringpi`
-* **[libconfig++](https://www.hyperrealm.com/oss_libconfig.shtml)**, as root install with: `apt-get install libconfig++9v5 libconfig++-dev`
+* **[WiringPi](https://github.com/WiringPi/WiringPi/releases)**, download and install as root with: `dpkg -i wiringpi_<VERSION>.deb`
+* **[libconfig++](https://www.hyperrealm.com/oss_libconfig.shtml)**, as root install with: `apt-get install libconfig++11 libconfig++-dev`
 
 Perform the following steps to compile and install aircontrol:
 
